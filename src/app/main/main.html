@@ -1,0 +1,265 @@
+<md-toolbar ng-hide="loading" layout="row" id="custom-toolbar">
+	<div class="md-toolbar-tools">
+		<div class="logo" ng-click="ctrl.tabOpen(-1)">
+			<!--<img src="app/assets/images/logo.png" alt="DocsX">-->
+
+		</div>
+		<div>
+			<!--ng-click="ctrl.renameFile($event)"-->
+			<span> 
+      <span><input type="text" id="rename-input" my-enter="ctrl.renameAndSave()" ng-model="file.metadata.title" ng-blur="ctrl.renameAndSave()" maxlength="250" pu-elastic-input/><md-tooltip>Click to rename</md-tooltip></span>
+			</span>
+			<md-button ng-if='file.metadata.id' ng-click="ctrl.addStar($event)" class="md-icon-button toolbar-action no-l-r-margin custom-icon"
+				aria-label="Add star">
+				<md-icon>
+					<div ng-class="file.metadata.labels.starred === true ? 'star-gold' : 'star'"></div>
+				</md-icon>
+				<md-tooltip>Add star</md-tooltip>
+			</md-button>
+			<md-button ng-if='file.metadata.id' ng-click="ctrl.moveToFolder($event)" class="md-icon-button toolbar-action small-icon no-l-r-margin custom-icon i-l">
+				<md-icon class="small-icon">
+					<div class="folder"></div>
+				</md-icon>
+				<md-tooltip>Move to folder</md-tooltip>
+			</md-button>
+
+			<md-button ng-if='file.metadata.id' ng-click="ctrl.moveDocumentToFolder($event)" class="md-icon-button toolbar-action small-icon no-l-r-margin custom-icon i-l"
+				id="iframe-btn" ng-class="selectedTab > 0 && documents[selectedTab - 1].id !== documents[selectedTab - 1].name  ? 'show' : 'hide'"
+				style="left: {{iconPositionLeft}}px">
+				<md-icon class="small-icon">
+					<div class="folder"></div>
+				</md-icon>
+				<md-tooltip>Move to folder</md-tooltip>
+			</md-button>
+
+
+			<!--<md-button ng-click="ctrl.saveFile($event)" class="md-icon-button toolbar-action" aria-label="Save file to Google Drive">
+        <md-icon alt="save"> <i class="material-icons">save</i> </md-icon>
+        <md-tooltip>Save file to Google Drive&#0153;</md-tooltip>
+      </md-button>-->
+			<!--<md-button ng-if='file.metadata.id' ng-click="ctrl.deleteDocument($event)" class="md-icon-button toolbar-action" aria-label="Save file to Google Drive">
+        <md-icon alt="save"><i class="material-icons">delete</i></md-icon>
+        <md-tooltip>Move to trash</md-tooltip>
+      </md-button>-->
+
+		</div>
+
+		<span class="grey save-message">
+      {{saveMessage}}
+    </span>
+
+		<span id="inpWidth"> 
+      <span><input type="text" id="iframe-input"  ng-model="iframeDocumentName"   pu-elastic-input/></span>
+		</span>
+
+		<div class="left box">
+			<!--
+      <md-button ng-click="ctrl.openDocsx()" class="md-icon-button toolbar-action">
+        <md-icon><i class="material-icons">open_in_browser</i></md-icon>
+        <md-tooltip>Open DocsX</md-tooltip>
+      </md-button>-->
+
+			<!--<md-button  class="md-icon-button toolbar-action" aria-label="Share file">
+        <md-icon alt="share"><i class="material-icons">share</i></md-icon>
+        <md-tooltip>Share file</md-tooltip>
+      </md-button>-->
+
+			<button class="button share-button " ng-click="ctrl.shareFile($event)" ng-if="selectedTab">
+        <md-icon><i class="material-icons white">person</i></md-icon>
+        Share
+      </button>
+
+			<button class="button share-button " ng-click="ctrl.shareDocument($event)" id="shareDoc" ng-class="selectedTab > 0 && documents[selectedTab - 1].id !== documents[selectedTab - 1].name && documents[selectedTab - 1].type !== 'docsx' && documents[selectedTab - 1].type !== 'form'  ? 'show' : 'hide'">
+        <md-icon><i class="material-icons white">person</i></md-icon>
+        Share
+      </button>
+
+			<a class="md-icon-button toolbar-action">
+				<md-menu mousepoint-menu>
+					<md-button ng-click="$mdOpenMousepointMenu($event)" class="md-icon-button toolbar-action ">
+						<md-icon><i class="material-icons grey">settings</i></md-icon>
+						<!--<md-tooltip>Application settings</md-tooltip>-->
+					</md-button>
+					<md-menu-content id="menu">
+						<md-menu-item>
+							<md-button ng-click="ctrl.deleteDocument($event)">
+								Delete DocsX
+							</md-button>
+						</md-menu-item>
+					</md-menu-content>
+				</md-menu>
+			</a>
+
+
+
+
+
+			<md-button class="md-fab md-user-icon-micro md-warn toolbar-action" aria-label="User" id="user-picture" style="background-image:url({{user.picture}})">
+				<md-tooltip class="user-tooltip">
+					<div>{{user.name}}</div>
+					<div>{{user.email}}</div>
+				</md-tooltip>
+			</md-button>
+
+
+
+		</div>
+
+	</div>
+</md-toolbar>
+<div ng-show="loading" layout-align="center center" flex layout="column">
+	<md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
+<md-content ng-hide="loading" flex class="editor-frame md-whiteframe-z1">
+	<div class="doc-container ">
+		<!--<img src="app/assets/images/thumb.png" >-->
+
+		<div class="cont" data-as-sortable="ctrl.dragControlListeners" data-ng-model="documents" ng-class="selectedTab == 0 ? 'show-iframe' : 'hide-iframe'">
+
+			<div ng-repeat="doc in documents" class="doc-preview-thumb doc-w" ng-dblclick="ctrl.tabOpen($index)" data-as-sortable-item>
+				<md-menu mousepoint-menu style="width:100%; height: 100%">
+
+
+					<div data-as-sortable-item-handle class="doc-preview-wrap" ng-right-click="$mdOpenMousepointMenu($event)">
+						<!--style="background-image: url('{{doc.thumbnailLink}}')"-->
+						<div class="thumb-container">
+							<img ng-src="{{doc.iconUrl.length > 0 && doc.iconUrl || '/app/assets/images/web.ico'}}" alt="thumb">
+						</div>
+						<div class="info">
+							<div class="ico-container">
+								<img ng-src="{{doc.iconUrl.length > 0 && doc.iconUrl || '/app/assets/images/web.png'}}" alt="ico">
+							</div>
+							<div class="title-container">
+								{{doc.name | cutTitle}}
+							</div>
+						</div>
+
+					</div>
+
+					<md-menu-content id="menu">
+						<md-menu-item>
+							<md-button ng-click="ctrl.tabOpen($index)">
+								Open
+							</md-button>
+						</md-menu-item>
+						<md-menu-item>
+							<md-button ng-click="ctrl.removeFromDocsx($index)">
+								Remove from this DocsX
+							</md-button>
+						</md-menu-item>
+						<md-menu-item>
+							<md-button ng-click="ctrl.moveToTrash($index, $event)">
+								Delete from Drive
+							</md-button>
+						</md-menu-item>
+					</md-menu-content>
+				</md-menu>
+			</div>
+		</div>
+		<!--ng-show="selectedTab === $index + 1"-->
+		<div class="full-height" ng-repeat="doc in documents" ng-class="selectedTab == $index + 1 ? 'show-iframe' : 'hide-iframe'">
+			<iframe ng-src="{{doc.url | trustAsResourceUrl}}" frameborder="0" height="100%" width="100%" target="_parent" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
+		</div>
+
+	</div>
+
+	<div class="tabs-list" data-as-sortable="ctrl.dragControlListeners" data-ng-model="documents">
+
+
+		<md-menu mousepoint-menu class="tab-element-static">
+			<div ng-click="$mdOpenMousepointMenu($event)">
+				<i class="material-icons sm-bold-icon">add</i>
+			</div>
+			<md-menu-content id="menu">
+
+				<md-menu-item>
+					<md-button ng-click="ctrl.openFile($event)">
+						Open Existing
+					</md-button>
+				</md-menu-item>
+
+				<md-menu-item>
+					<md-button ng-click="ctrl.openDocsx()">
+						Open DocsX
+					</md-button>
+				</md-menu-item>
+				<md-menu mousepoint-menu class="tab-element-static">
+					<md-menu-item>
+						<md-button ng-click="ctrl.createNew('document')">
+							Create New File
+						</md-button>
+					</md-menu-item>
+					<md-menu-content id="menu">
+
+						<md-menu-item>
+							<md-button ng-click="ctrl.createNew('document')">
+								Google Doc
+							</md-button>
+						</md-menu-item>
+
+						<md-menu-item>
+							<md-button ng-click="ctrl.createNew('sheet')">
+								Google Sheet
+							</md-button>
+						</md-menu-item>
+
+						<md-menu-item>
+							<md-button ng-click="ctrl.createNew('drawing')">
+								Google Drawing
+							</md-button>
+						</md-menu-item>
+
+						<md-menu-item>
+							<md-button ng-click="ctrl.createNew('form')">
+								Google Form
+							</md-button>
+						</md-menu-item>
+
+						<md-menu-item>
+							<md-button ng-click="ctrl.createNew('docsx')">
+								New DocsX
+							</md-button>
+						</md-menu-item>
+
+					</md-menu-content>
+				</md-menu>
+				<md-menu-item>
+					<md-button ng-click="ctrl.addUrl($event)">
+						Add URL
+					</md-button>
+				</md-menu-item>
+			</md-menu-content>
+		</md-menu>
+
+
+
+		<div class="tab-element-static" ng-click="ctrl.tabOpen(-1)">
+			<i class="material-icons sm-bold-icon">reorder</i>
+		</div>
+
+
+
+		<div class="tab-element" ng-class="selectedTab == $index + 1 ? 'active-tab' : ''" data-ng-repeat="doc in documents" data-as-sortable-item
+			ng-click="ctrl.tabOpen($index)">
+			<md-menu mousepoint-menu style="width:100%; height: 100% ;display: flex;align-items: center;justify-content: center;">
+				<div class="full-pointer" data-as-sortable-item-handle ng-right-click="$mdOpenMousepointMenu($event)">
+					<!--<md-icon><i class="material-icons"><img class="p-b-5" ng-src="{{trustSrc(doc.iconLink)}}" alt="thumb"></i></md-icon>-->
+					<img ng-src="{{doc.iconUrl.length > 0 && doc.iconUrl || '/app/assets/images/web.png'}}" alt="ico" class="tab-icon">					{{doc.name | cutTitle}}
+				</div>
+				<md-menu-content id="menu">
+					<md-menu-item>
+						<md-button ng-click="ctrl.removeFromDocsx($index)">
+							Remove from this DocsX
+						</md-button>
+					</md-menu-item>
+					<md-menu-item>
+						<md-button ng-click="ctrl.moveToTrash($index, $event)">
+							Delete from Drive
+						</md-button>
+					</md-menu-item>
+				</md-menu-content>
+			</md-menu>
+		</div>
+
+	</div>
+</md-content>

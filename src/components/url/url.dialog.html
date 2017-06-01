@@ -1,0 +1,20 @@
+<md-dialog>
+  <md-dialog-content class="md-dialog-content">
+  
+      <md-input-container>
+        <label>Add URL</label>
+        <form ng-submit="ctrl.save()">
+        <input md-autofocus ng-model="form.url" type="url">
+        </form>
+      </md-input-container>
+
+  </md-dialog-content>
+  <md-dialog-actions>
+    <md-button  ng-click="ctrl.cancel()">
+      Cancel
+    </md-button>
+    <md-button   ng-click="ctrl.save()">
+      Add
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

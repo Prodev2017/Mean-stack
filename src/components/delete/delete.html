@@ -1,0 +1,18 @@
+<md-dialog>
+  <md-dialog-content class="md-dialog-content">
+    <h2 class="md-title">{{form.topMessage}}</h2>
+    <div class="md-dialog-content-body ">
+      <p>{{form.message}}</p>
+      <p>{{form.title}}</p>
+      <p>{{form.psMessage}}</p>
+    </div>
+  </md-dialog-content>
+  <md-dialog-actions>
+    <md-button class="md-accent md-raised" ng-click="ctrl.delete()">
+      CONFIRM
+    </md-button>
+    <md-button ng-click="ctrl.cancel()">
+      CANCEL
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>
